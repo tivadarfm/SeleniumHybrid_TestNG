@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * Created by knigam on 8/12/16.
+ * 
  * a generic class with default webdriver initiaters and waits
  */
-public class GenericClass {
+public class AjaxHandler {
 
     /**
      * simply returns the Webdriver of a specific flavor can be used with YAML or Properties, needs to be updated
