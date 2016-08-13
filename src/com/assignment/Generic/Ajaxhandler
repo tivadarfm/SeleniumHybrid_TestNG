@@ -1,1 +1,111 @@
-dummy
+import org.openqa.selenium.*;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import com.google.common.base.Function;
+
+import java.util.concurrent.TimeUnit;
+
+
+/**
+ * Created by knigam on 8/12/16.
+ * a generic class with default webdriver initiaters and waits
+ */
+public class GenericClass {
+
+    /**
+     * simply returns the Webdriver of a specific flavor can be used with YAML or Properties, needs to be updated
+     */
+    public WebDriver getSpecificBrowser(String browser) {
+
+        WebDriver driver = null;
+        switch (browser) {
+            case "firefox":
+                driver = new FirefoxDriver();
+                break;
+
+            //need to change the chrome driver path
+            case "chrome":
+                System.setProperty("webdriver.chrome.driver", "/Users/knigam/Downloads/chromedriver");
+                driver = new ChromeDriver();
+                break;
+            case "IE":
+                driver = new InternetExplorerDriver();
+                break;
+            default:
+                System.out.println("browser : " + browser + " is invalid, setting null to ");
+
+        }
+
+        return driver;
+    }
+
+
+    // for explicit waits
+    public WebElement waitExplicitly(By locator, WebDriver driver, int timeoutInSeconds) {
+
+        return (new WebDriverWait(driver, timeoutInSeconds))
+                .until(ExpectedConditions.presenceOfElementLocated(locator));
+    }
+
+    //for implicit wait
+    public void waitImplicitly(WebDriver driver, int timeoutInSeconds) {
+        driver.manage().timeouts().implicitlyWait(timeoutInSeconds, TimeUnit.SECONDS);
+
+    }
+
+
+    //fluid wait
+    public WebElement waitFluently(WebDriver driver, By locator, int timeoutInSeconds, int pollingTime) {
+
+
+        Wait<WebDriver> wait = new FluentWait<>(driver)
+                .withTimeout(timeoutInSeconds, TimeUnit.SECONDS)
+                .pollingEvery(pollingTime, TimeUnit.SECONDS)
+                .ignoring(NoSuchElementException.class).ignoring(StaleElementReferenceException.class);
+
+
+        return wait.until(new Function<WebDriver, WebElement>() {
+
+                    public WebElement apply(WebDriver driver) {
+                        return driver.findElement(locator);
+                    }
+                });
+
+
+
+
+    }
+
+
+    //unclean version of checking if an ajax call is active (preferrable when an ajax call makes a get and changes the DOM)
+    public void waitForAjax(int timeoutInSeconds, WebDriver driver) {
+        System.out.println("Checking active ajax calls by calling jquery.active");
+        try {
+            if (driver instanceof JavascriptExecutor) {
+                JavascriptExecutor jsDriver = (JavascriptExecutor) driver;
+                for (int i = 0; i < timeoutInSeconds; i++) {
+                    Object numberOfAjaxConnections = jsDriver.executeScript("return jQuery.active");
+                    // return should be a number
+                    if (numberOfAjaxConnections instanceof Long) {
+                        Long n = (Long) numberOfAjaxConnections;
+                        System.out.println("Number of active jquery ajax calls: " + n);
+                        if (n.longValue() == 0L)
+                            break;
+                    }
+                    Thread.sleep(1000);
+                }
+            } else {
+                System.out.println("Web driver: " + driver + " cannot execute javascript");
+            }
+        } catch (InterruptedException e) {
+            System.out.println(e);
+        }
+
+
+    }
