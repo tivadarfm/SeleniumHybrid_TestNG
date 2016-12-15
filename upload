@@ -1,0 +1,17 @@
+uploading file method
+
+
+  /**
++     * upload specified file
++     *
++     * @param browser  browser on which file is to be uploaded (works on PHANTOMJS and CHROME)
++     * @param locator  css locator for input with attribute type as file
++     * @param filename exact locations of the file
++     */
++    public void uploadFile(WebDriverFactory.Browser browser, String locator, String filename) {
++
++        if (browser.equals(WebDriverFactory.Browser.PHANTOMJS))
++            ((PhantomJSDriver) driver).executePhantomJS("var page = this;" + " page.uploadFile('" + locator + "', '" + filename + "');");
++        else
++            driver.findElement(By.cssSelector(locator)).sendKeys(filename);
++
