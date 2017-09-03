@@ -20,9 +20,9 @@ import java.util.List;
  */
 public class GetPageObjects {
 
-    String stack = "https://qeauto.tracelink.com/login";
+    String stack = "https://qyo/login";
     String browser = "firefox";
-    String username = "qeauto+zzauto201608171114459251-coa@tracelink.com";
+    String username = "jeer";
     String password = "Password1#";
     String[] tags = {"h1", "h2","input", "button", "select","a","textarea"};
     boolean excludeDisplayNone = true;
